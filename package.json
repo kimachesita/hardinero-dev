@@ -1,0 +1,16 @@
+{
+  "name": "hardinero",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "kimachesita",
+  "license": "ISC",
+  "dependencies": {
+    "pigpio": "^1.0.0",
+    "pigpio-dht": "^1.1.0",
+    "socket.io-client": "^2.1.0"
+  }
+}
