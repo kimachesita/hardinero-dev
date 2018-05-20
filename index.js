@@ -2,6 +2,8 @@ const Gpio = require('pigpio').Gpio;
 const dht = require('pigpio-dht');
 const socket = require('socket.io-client')('http://msuiit-hardinero.herokuapp.com');
 
+
+//pin definitions
 const SNR_TRIGGER = 27,
     SNR_ECHO = 22,
     DHT22_TYPE = 22,
@@ -10,9 +12,11 @@ const SNR_TRIGGER = 27,
     SOIL_PROBE2 = 24,
     RLY_SW1 = 5,
     RLY_SW2 = 6,
-    MICROSECDONDS_PER_CM = 1e6 / 34321,
-    REPORT_RATE = 5000,
-    DEVICE_KEY = process.env.DEVKEY || 'def123';
+    MICROSECDONDS_PER_CM = 1e6 / 34321, //speed of sound
+    SENSOR_CHECK_RATE = 1000, //ms how often to check parameter conditions
+    REPORT_RATE = 5000, //ms
+    DEVICE_KEY = process.env.DEVKEY || 'def123',
+    TANK_LEVEL_CAL = 150; //tank level calibrator, set to value where 100% is obtained, defaut 100
 
 //parameter variables
 let parameters = {
@@ -31,7 +35,7 @@ let data = {
     humidity: 0,
     waterMoisture1: 0,
     waterMoisture2: 0,
-    waterPumpOn: 0,
+    waterPumpOn: false,
     tankLevel: 0,
     lastWatering: 'No Data',
     device_key: parameters.device_key
@@ -104,13 +108,14 @@ function setup() {
     let startTick;
 
     gpios.snr_echo.on('alert', function (level, tick) {
-        let endTick, diff;
+        let endTick, diff, distance;
         if (level == 1) {
             startTick = tick;
         } else {
             endTick = tick;
             diff = (endTick >> 0) - (startTick >> 0); // Unsigned 32 bit arithmetic
-            data.tankLevel = diff / 2 / MICROSECDONDS_PER_CM;
+            distance = diff / 2 / MICROSECDONDS_PER_CM; //get distance based on the speed of sound
+            data.tankLevel = ((TANK_LEVEL_CAL - distance) / TANK_LEVEL_CAL) * 100; //get remaing tank level in %
         }
     })
 
@@ -134,13 +139,14 @@ function setup() {
 
     //soil moisture operation
     gpios.soil_prb1.on('interrupt', (level) => {
-        data.waterMoisture1 = !level;
+        data.waterMoisture1 = !level; //for digital implementation for now... change if ADC will be used
     });
 
 
     gpios.soil_prb2.on('interrupt', (level) => {
-        data.waterMoisture2 = !level;
+        data.waterMoisture2 = !level; //for digital implementation for now... change if ADC will be used
     });
+
 
     //relay operations
     /* let temp = 0;
@@ -166,6 +172,43 @@ function setup() {
 
     }, REPORT_RATE);
 
+    //auto watering routine
+    setInterval(function () {
+        let now = new Date();
+        
+        if (parameters.cropMoistureLimit > 0 &&
+            (data.waterMoisture1 < parameters.cropMoistureLimit ||
+                (data.waterMoisture2 < parameters.cropHumidityLimit))) {
+                //water moisture in critical level
+                activatePump();
+        } else if (parameters.cropHumidityLimit > 0 && 
+                    data.humidity < parameters.cropHumidityLimit) {
+                    //atmosphere humidity in critical level
+                    activatePump();
+        }else if(){
+
+        }else{
+            deactivatePump();
+        }
+    }, SENSOR_CHECK_RATE);
+
+}
+
+function activatePump(){
+    if(!data.waterPumpOn){
+        data.waterPumpOn = true;
+        gpios.rly_sw1.digitalWrite(1);
+        gpios.rly_sw2.digitalWrite(1);
+        let now = new Date();
+        data.lastWatering = (now.getMonth() + 1) + "/" + now.getDate() + '/' + now.getYear()
+                            + ' ' + now.getHours() + '-' + (now.getMinutes()) + '-' + (now.getSeconds()); 
+    }
+}
+
+function deactivatePump(){
+    data.waterPumpOn = false;
+    gpios.rly_sw1.digitalWrite(0);
+    gpios.rly_sw2.digitalWrite(0);
 }
 
 // for testing purposes
