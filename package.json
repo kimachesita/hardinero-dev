@@ -9,6 +9,8 @@
   "author": "kimachesita",
   "license": "ISC",
   "dependencies": {
+    "raspi": "^5.0.2",
+    "raspi-i2c": "^6.1.2",
     "socket.io-client": "^2.1.0"
   }
 }
