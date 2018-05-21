@@ -21,7 +21,7 @@ Raspi.init(() => {
         sps: ADS1x15.spsADS1015.SPS_250         // data rate (samples per second)
     });
 
-    setInterval(() => {
+    setInterval(function (){
         // Get a single-ended reading from channel-0 and display the results
         adc.readChannel(ADS1x15.channel.CHANNEL_0, (err, value, volts) => {
             if (err) {
