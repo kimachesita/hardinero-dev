@@ -260,12 +260,12 @@ function deactivatePump() {
 // for testing purposes
 function updateDummyData(){
     data.weather = 'No Data';
-    data.temperature++;
-    data.humidity++;
-    data.soilMoisture1++;
-    data.soilMoisture2++;
-    data.waterPumpOn = !data.waterPumpOn;
-    data.tankLevel++;
+    data.temperature = Math.floor(Math.random() * 100);
+    data.humidity = Math.floor(Math.random() * 100);
+    data.soilMoisture1  = Math.floor(Math.random() * 100);
+    data.soilMoisture2 = Math.floor(Math.random() * 100);
+    data.waterPumpOn = false;
+    data.tankLevel = Math.floor(Math.random() * 100);
     data.lastWatering = 'No Data'
 }
 
