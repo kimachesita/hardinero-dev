@@ -1,11 +1,11 @@
-const Gpio = require('pigpio').Gpio;
+/* const Gpio = require('pigpio').Gpio;
 const dht = require('pigpio-dht');
 const Raspi = require('raspi');
 const I2C = require('raspi-i2c').I2C;
-const ADS1x15 = require('raspi-kit-ads1x15');
+const ADS1x15 = require('raspi-kit-ads1x15'); */
 
 //configure socket
-const socket = require('socket.io-client')('http://msuiit-hardinero.herokuapp.com');
+const socket = require('socket.io-client')('http://localhost:3000');
 
 
 //pin definitions
@@ -13,16 +13,15 @@ const SNR_TRIGGER = 27,
     SNR_ECHO = 22,
     DHT22_TYPE = 22,
     DHT22_DATA = 17,
-    //SOIL_PROBE1 = 23,
-    //SOIL_PROBE2 = 24,
+    SOIL_PROBE1 = 23,
+    SOIL_PROBE2 = 24,
     RLY_SW1 = 5,
     RLY_SW2 = 6,
     MICROSECDONDS_PER_CM = 1e6 / 34321, //speed of sound
     SENSOR_CHECK_RATE = 1000, //ms how often to check parameter conditions
     REPORT_RATE = 5000, //ms
-    DEVICE_KEY = process.env.DEVKEY || 'hardinero',
-    TANK_LEVEL_CAL = 150, //tank level calibrator, set to value where 100% is obtained, defaut 100
-    SLENGTH = 120; // number of seconds to activate pump if wateringFrequency condition met
+    DEVICE_KEY = process.env.DEVKEY || 'def123',
+    TANK_LEVEL_CAL = 150; //tank level calibrator, set to value where 100% is obtained, defaut 100
 
 //parameter variables
 let parameters = {
@@ -47,32 +46,29 @@ let data = {
     device_key: parameters.device_key
 }
 
-//utility variables
 let connected = false;
-let w_seconds_past = 0;
-let w_activated = false;
 
-let gpios = {
+/* let gpios = {
     snr_trigger: null,
     snr_echo: null,
     dht22_data: null,
-    //soil_prb1: null,
-    //soil_prb2: null,
+    soil_prb1: null,
+    soil_prb2: null,
     rly_sw1: null,
     rly_sw2: null
-}
+} */
 
-function configurePins() {
+/* function configurePins() {
     //configure pins
     gpios.snr_trigger = new Gpio(SNR_TRIGGER, { mode: Gpio.OUTPUT });
     gpios.snr_trigger.digitalWrite(0); //make sure trigger is low
     gpios.snr_echo = new Gpio(SNR_ECHO, { mode: Gpio.INPUT, alert: true });
     gpios.dht22_data = dht(DHT22_DATA, DHT22_TYPE);
-    //gpios.soil_prb1 = new Gpio(SOIL_PROBE1, { mode: Gpio.INPUT, edge: Gpio.EITHER_EDGE });
-    //gpios.soil_prb2 = new Gpio(SOIL_PROBE2, { mode: Gpio.INPUT, edge: Gpio.EITHER_EDGE });
+    gpios.soil_prb1 = new Gpio(SOIL_PROBE1, { mode: Gpio.INPUT, edge: Gpio.EITHER_EDGE });
+    gpios.soil_prb2 = new Gpio(SOIL_PROBE2, { mode: Gpio.INPUT, edge: Gpio.EITHER_EDGE });
     gpios.rly_sw1 = new Gpio(RLY_SW1, { mode: Gpio.OUTPUT, pullUpDown: Gpio.PUD_DOWN });
     gpios.rly_sw2 = new Gpio(RLY_SW2, { mode: Gpio.OUTPUT, pullUpDown: Gpio.PUD_DOWN });
-}
+} */
 
 
 function configureSocket() {
@@ -102,14 +98,14 @@ function configureSocket() {
         connected = false;
     });
 
-    /* socket.on('overwrite', function (data) {
+    socket.on('overwrite', function (data) {
         if (data.device_key == DEVICE_KEY) {
             console.log(`Configuration Change: ${data}`);
         }
-    }); */
+    });
 }
 
-function configureRaspi() {
+/* configureRaspi(){
     // Init Raspi
     Raspi.init(() => {
 
@@ -131,7 +127,7 @@ function configureRaspi() {
             // Get a single-ended reading from channel-0 and display the results
             adc.readChannel(ADS1x15.channel.CHANNEL_0, (err, value, volts) => {
                 if (err) {
-                    console.error('Failed to fetch value from ADC CH0', err);
+                    console.error('Failed to fetch value from ADC', err);
                 } else {
                     data.soilMoisture1 = value;
                 }
@@ -139,41 +135,23 @@ function configureRaspi() {
 
             adc.readChannel(ADS1x15.channel.CHANNEL_1, (err, value, volts) => {
                 if (err) {
-                    console.error('Failed to fetch value from ADC CH1', err);
+                    console.error('Failed to fetch value from ADC', err);
                 } else {
-                    data.soilMoisture2 = value;
+                    data.soilMoisture2
                 }
             });
         }, 1000);
 
     });
-}
-
-function activatePump() {
-    let now = new Date();
-    if (!data.waterPumpOn) {
-        data.waterPumpOn = true;
-        gpios.rly_sw1.digitalWrite(1);
-        gpios.rly_sw2.digitalWrite(1);
-        let now = new Date();
-        data.lastWatering = (now.getMonth() + 1) + "/" + now.getDate() + '/' + now.getYear()
-            + ' ' + now.getHours() + '-' + (now.getMinutes()) + '-' + (now.getSeconds());
-    }
-}
-
-function deactivatePump() {
-    data.waterPumpOn = false;
-    gpios.rly_sw1.digitalWrite(0);
-    gpios.rly_sw2.digitalWrite(0);
-}
+} */
 
 function setup() {
-    configurePins();
+    //configurePins();
     configureSocket();
-    configureRaspi();
+    //configureRaspi();
 
     // sonar operations
-    let startTick;
+    /* let startTick;
 
     gpios.snr_echo.on('alert', function (level, tick) {
         let endTick, diff, distance;
@@ -215,7 +193,7 @@ function setup() {
         data.soilMoisture2 = !level; //for digital implementation for now... change if ADC will be used
     });
 
-
+ */
     //relay operations
     /* let temp = 0;
 
@@ -233,7 +211,7 @@ function setup() {
         console.log(`Soil Bed 1: ${data.soilMoisture1}`);
         console.log(`Soil Bed 2: ${data.soilMoisture2}`);
         if (connected) {
-            //updateDummyData();
+            updateDummyData();
             socket.emit('report', data);
             console.log('Data Reported to server');
         }
@@ -241,54 +219,46 @@ function setup() {
     }, REPORT_RATE);
 
     //auto watering routine
-    setInterval(function () {
-
-        let n = new Date();
-        let h = n.getHours();
-        let m = n.getMinutes();
-        let wfactor = 721;
-        if(parameters.cropWateringFrequency == 1){
-            wfactor = 721;
-        }
-        wfactor = Math.floor( 720 / (parameters.cropWateringFrequency - 1));
-
+    /* setInterval(function () {
+        let now = new Date();
 
         if (parameters.cropMoistureLimit > 0 &&
             (data.soilMoisture1 < parameters.cropMoistureLimit ||
-                (data.soilMoisture2 < parameters.cropMoistureLimit))) {
-            //water moisture in critical levels
+                (data.soilMoisture2 < parameters.cropHumidityLimit))) {
+            //water moisture in critical level
             activatePump();
         } else if (parameters.cropHumidityLimit > 0 &&
             data.humidity < parameters.cropHumidityLimit) {
             //atmosphere humidity in critical level
             activatePump();
-        } else if (parameters.cropWateringFrequency > 0) {
-            //watering frequency valid only from 6->18 (6am to 6pm)
-            if (12 <= h && h <= 24) {
-                let min_from_zero = ((h - 12) * 60 + m);
-                if ((min_from_zero % wfactor) == 0 && w_activated == false) {
-                    w_activated = true;
-                    activatePump();
-                }
-                if (w_activated) {
-                    w_seconds_past++;
-                    if (w_seconds_past == SLENGTH) {
-                        w_seconds_past = 0;
-                        w_activated = false;
-                        deactivatePump();
-                    }
-                }
-            }
+        } else if () {
+
         } else {
             deactivatePump();
         }
-    }, SENSOR_CHECK_RATE);
+    }, SENSOR_CHECK_RATE); */
 
 }
 
+/* function activatePump() {
+    if (!data.waterPumpOn) {
+        data.waterPumpOn = true;
+        gpios.rly_sw1.digitalWrite(1);
+        gpios.rly_sw2.digitalWrite(1);
+        let now = new Date();
+        data.lastWatering = (now.getMonth() + 1) + "/" + now.getDate() + '/' + now.getYear()
+            + ' ' + now.getHours() + '-' + (now.getMinutes()) + '-' + (now.getSeconds());
+    }
+}
+
+function deactivatePump() {
+    data.waterPumpOn = false;
+    gpios.rly_sw1.digitalWrite(0);
+    gpios.rly_sw2.digitalWrite(0);
+} */
 
 // for testing purposes
-/* function updateDummyData(){
+function updateDummyData(){
     data.weather = 'No Data';
     data.temperature++;
     data.humidity++;
@@ -297,7 +267,7 @@ function setup() {
     data.waterPumpOn = !data.waterPumpOn;
     data.tankLevel++;
     data.lastWatering = 'No Data'
-} */
+}
 
 
 //begin main routine
