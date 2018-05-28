@@ -5,7 +5,7 @@ const I2C = require('raspi-i2c').I2C;
 const ADS1x15 = require('raspi-kit-ads1x15'); */
 
 //configure socket
-const socket = require('socket.io-client')('http://localhost:3000');
+const socket = require('socket.io-client')('http://msuiit-hardinero.herokuapp.com');
 
 
 //pin definitions
