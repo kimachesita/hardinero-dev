@@ -21,10 +21,10 @@ Raspi.init(() => {
         sps: ADS1x15.spsADS1115.SPS_250         // data rate (samples per second)
     });
 
-    /*     setInterval(function (){
+        setInterval(function (){
             // Get a single-ended reading from channel-0 and display the results
     
-            adc.readChannel(ADS1x15.channel.CHANNEL_2, (err, value, volts) => {
+            /* adc.readChannel(ADS1x15.channel.CHANNEL_2, (err, value, volts) => {
                 if (err) {
                     console.error('Failed to fetch value from ADC', err);
                     process.exit(1);
@@ -34,7 +34,7 @@ Raspi.init(() => {
                     console.log(' * Volts:', volts);    // voltage reading factoring in the PGA
                     //
                 }
-            });
+            }); */
             adc.readChannel(ADS1x15.channel.CHANNEL_3, (err, value, volts) => {
                 if (err) {
                     console.error('Failed to fetch value from ADC', err);
@@ -46,54 +46,6 @@ Raspi.init(() => {
                     //
                 }
             });
-        }, 1000); */
-    // Starts continuous readings from channel-0 and displays the initial results
-    adc.startContinuousChannel(ADS1x15.channel.CHANNEL_2, (err, value, volts) => {
-        if (err) {
-            console.error('Failed to fetch value from ADC', err);
-        } else {
-            console.log('Channel 2');
-            console.log(' * Value:', value);    // will be a 11 or 15 bit integer depending on chip
-            console.log(' * Volts:', volts);    // voltage reading factoring in the PGA
-        }
-
-        // From here on, call adc.getLastReading(...) for future readings
-        setInterval(()=>{
-        adc.getLastReading((err, value, volts) => {
-            if (err) {
-              console.error('Failed to fetch value from ADC', err);
-          } else {
-                console.log('Channel 2');
-              console.log(' * Value:', value);    // will be a 11 or 15 bit integer depending on chip
-              console.log(' * Volts:', volts);    // voltage reading factoring in the PGA
-          }
-        })},1000 );
-
-        // When done, call adc.stopContinuousReadings(...) to stop the chip readings
-    });
-
-    adc.startContinuousChannel(ADS1x15.channel.CHANNEL_3, (err, value, volts) => {
-        if (err) {
-            console.error('Failed to fetch value from ADC', err);
-        } else {
-            console.log('Channel 3');
-            console.log(' * Value:', value);    // will be a 11 or 15 bit integer depending on chip
-            console.log(' * Volts:', volts);    // voltage reading factoring in the PGA
-        }
-
-        // From here on, call adc.getLastReading(...) for future readings
-        setInterval(()=>{
-            adc.getLastReading((err, value, volts) => {
-                if (err) {
-                  console.error('Failed to fetch value from ADC', err);
-              } else {
-                  console.log('Channel 3');
-                  console.log(' * Value:', value);    // will be a 11 or 15 bit integer depending on chip
-                  console.log(' * Volts:', volts);    // voltage reading factoring in the PGA
-              }
-            })},1000 );
-
-        // When done, call adc.stopContinuousReadings(...) to stop the chip readings
-    });
+        }, 1000);
 
 });
