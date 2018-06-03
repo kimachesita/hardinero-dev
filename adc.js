@@ -58,7 +58,7 @@ Raspi.init(() => {
         }
 
         // From here on, call adc.getLastReading(...) for future readings
-        setInterval( 
+        setInterval(()=>{
         adc.getLastReading((err, value, volts) => {
             if (err) {
               console.error('Failed to fetch value from ADC', err);
@@ -67,7 +67,7 @@ Raspi.init(() => {
               console.log(' * Value:', value);    // will be a 11 or 15 bit integer depending on chip
               console.log(' * Volts:', volts);    // voltage reading factoring in the PGA
           }
-        }),1000 );
+        })},1000 );
 
         // When done, call adc.stopContinuousReadings(...) to stop the chip readings
     });
@@ -82,7 +82,7 @@ Raspi.init(() => {
         }
 
         // From here on, call adc.getLastReading(...) for future readings
-        setInterval( 
+        setInterval(()=>{
             adc.getLastReading((err, value, volts) => {
                 if (err) {
                   console.error('Failed to fetch value from ADC', err);
@@ -91,7 +91,7 @@ Raspi.init(() => {
                   console.log(' * Value:', value);    // will be a 11 or 15 bit integer depending on chip
                   console.log(' * Volts:', volts);    // voltage reading factoring in the PGA
               }
-            }),1000 );
+            })},1000 );
 
         // When done, call adc.stopContinuousReadings(...) to stop the chip readings
     });
