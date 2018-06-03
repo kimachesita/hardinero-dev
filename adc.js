@@ -18,7 +18,7 @@ Raspi.init(() => {
 
         // Defaults for future readings
         pga: ADS1x15.pga.PGA_4_096V,            // power-gain-amplifier range
-        sps: ADS1x15.spsADS1015.SPS_250         // data rate (samples per second)
+        sps: ADS1x15.spsADS1115.SPS_250         // data rate (samples per second)
     });
 
     setInterval(function (){
