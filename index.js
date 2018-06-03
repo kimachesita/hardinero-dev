@@ -167,8 +167,8 @@ function activatePump() {
     let now = new Date();
     if (!data.waterPumpOn) {
         data.waterPumpOn = true;
-        gpios.rly_sw1.digitalWrite(1);
-        gpios.rly_sw2.digitalWrite(1);
+        gpios.rly_sw1.digitalWrite(0);
+        gpios.rly_sw2.digitalWrite(0);
         let now = new Date();
         data.lastWatering = (now.getMonth() + 1) + "/" + now.getDate() + '/' + now.getYear()
             + ' ' + now.getHours() + '-' + (now.getMinutes()) + '-' + (now.getSeconds());
@@ -177,8 +177,8 @@ function activatePump() {
 
 function deactivatePump() {
     data.waterPumpOn = false;
-    gpios.rly_sw1.digitalWrite(0);
-    gpios.rly_sw2.digitalWrite(0);
+    gpios.rly_sw1.digitalWrite(1);
+    gpios.rly_sw2.digitalWrite(1);
 }
 
 function setup() {
@@ -254,6 +254,12 @@ function setup() {
         console.log(`Soil Bed 2: ${data.soilMoisture2}%`);
         if (connected) {
             //updateDummyData();
+            //correct floating point
+            data.tankLevel = data.tankLevel.toFixed(2);
+            data.soilMoisture1 = data.soilMoisture1.toFixed(2);
+            data.soilMoisture2 = data.soilMoisture2.toFixed(2);
+            data.temperature = data.temperature.toFixed(2);
+            data.humidity = data.humidity.toFixed(2);
             socket.emit('report', data);
             console.log('Data Reported to server');
         }
