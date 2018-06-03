@@ -21,11 +21,11 @@ const SNR_TRIGGER = 27, //pin 13
     SENSOR_CHECK_RATE = 1000, //ms how often to check parameter conditions
     REPORT_RATE = 2000, //ms
     DEVICE_KEY = process.env.DEVKEY || 'hardinero',
-    //calibrated value
-    DISTANCE_MAX = 200, //value of d where tank is empty
-    DISTANCE_MIN = 0,   //value of d where tank is full
-    MOISTURE_MAX = 4000, //moisture max value, change according to calibration
-    MOISTURE_MIN = 2000, //moisture min value, change according to calibration
+    //calibration values
+    DISTANCE_MAX = 43, //sonar value d where tank is empty, change according to calibration
+    DISTANCE_MIN = 5,   //sonar value d where tank is full, change according to calibration
+    MOISTURE_MAX = 24000, //moisture max value, (when dry), change according to calibration
+    MOISTURE_MIN = 12000, //moisture min value,  (when wet) change according to calibration
     SLENGTH = 120; // number of seconds to activate pump if wateringFrequency condition met
 
 //parameter variables
@@ -44,9 +44,12 @@ let data = {
     temperature: 0,
     humidity: 0,
     soilMoisture1: 0,
+    soilMoistureCorrected1 = 0,
     soilMoisture2: 0,
+    soilMoistureCorrected2 = 0,
     waterPumpOn: false,
     tankLevel: 0,
+    tankLevelCorrected: 0,
     lastWatering: 'No Data',
     device_key: parameters.device_key
 }
@@ -94,13 +97,13 @@ function configureRaspi() {
                 if (err) {
                     console.error('Failed to fetch value from ADC CH0', err);
                 } else {
-                    /* if(value > MOISTURE_MAX){
+                    data.soilMoisture1 = value;
+                    if(value > MOISTURE_MAX){
                         value = MOISTURE_MAX;
                     }else if( value < MOISTURE_MIN){
                         value = MOISTURE_MIN;
-                    } */
-                    data.soilMoisture1 = value;
-                    data.soilMoisture1 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
+                    }
+                    data.soilMoistureCorrected1 = (1 - ((value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN)))*100;
                 }
             });
 
@@ -108,13 +111,14 @@ function configureRaspi() {
                 if (err) {
                     console.error('Failed to fetch value from ADC CH1', err);
                 } else {
-                    /* if(value > MOISTURE_MAX){
-                        value = MOISTURE_MAX;
-                    }else if( value < s){
-                        value = MOISTURE_MIN;
-                    } */
-                    //data.soilMoisture2 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
                     data.soilMoisture2 = value;
+                    if(value > MOISTURE_MAX){
+                        value = MOISTURE_MAX;
+                    }else if( value < MOISTURE_MIN){
+                        value = MOISTURE_MIN;
+                    }
+                    data.soilMoistureCorrected2 = (1 - ((value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN)))*100;
+                    
                 }
             });
         }, 1000);
@@ -139,13 +143,14 @@ function setup() {
             endTick = tick;
             diff = (endTick >> 0) - (startTick >> 0); // Unsigned 32 bit arithmetic
             distance = diff / 2 / MICROSECONDS_PER_CM; //get distance based on the speed of sound
-           /*  if( distance > DISTANCE_MAX){
+            data.tankLevel = distance;
+            if( distance > DISTANCE_MAX){
                 distance = DISTANCE_MAX;
             }else if(distance < DISTANCE_MIN){
                 distance = DISTANCE_MIN;
-            } */
-            //data.tankLevel = 100*(distance - DISTANCE_MAX)/(DISTANCE_MAX - DISTANCE_MIN);
-            data.tankLevel = distance;
+            }
+            data.tankLevelCorrected = 100*(distance - DISTANCE_MAX)/(DISTANCE_MAX - DISTANCE_MIN);
+            
         }
     })
 
@@ -181,10 +186,13 @@ function setup() {
     // reporting
     setInterval(function () {
         console.log(`Distance: ${data.tankLevel}`);
+        console.log(`TankLevel: ${data.tankLevelCorrected}`); 
         console.log(`temp: ${data.temperature}°c`);
         console.log(`rhum: ${data.humidity}%`);
         console.log(`Soil Bed 1: ${data.soilMoisture1}`);
+        console.log(`Soil Bed 1 %: ${data.soilMoistureCorrected1}`);
         console.log(`Soil Bed 2: ${data.soilMoisture2}`);
+        console.log(`Soil Bed 2 %: ${data.soilMoistureCorrected2}`);
     }, REPORT_RATE);
 
 }

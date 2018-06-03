@@ -22,10 +22,10 @@ const SNR_TRIGGER = 27,
     REPORT_RATE = 5000, //ms
     DEVICE_KEY = process.env.DEVKEY || 'hardinero',
     //calibration values
-    DISTANCE_MAX = 200, //sonar value d where tank is empty, change according to calibration
-    DISTANCE_MIN = 0,   //sonar value d where tank is full, change according to calibration
-    MOISTURE_MAX = 4000, //moisture max value, change according to calibration
-    MOISTURE_MIN = 2000, //moisture min value, change according to calibration
+    DISTANCE_MAX = 43, //sonar value d where tank is empty, change according to calibration
+    DISTANCE_MIN = 5,   //sonar value d where tank is full, change according to calibration
+    MOISTURE_MAX = 24000, //moisture max value, (when dry), change according to calibration
+    MOISTURE_MIN = 12000, //moisture min value,  (when wet) change according to calibration
     SLENGTH = 120; // number of seconds to activate pump if wateringFrequency condition met
 
 //parameter variables
@@ -135,27 +135,27 @@ function configureRaspi() {
             // Get a single-ended reading from channel-0 and display the results
             adc.readChannel(ADS1x15.channel.CHANNEL_2, (err, value, volts) => {
                 if (err) {
-                    console.error('Failed to fetch value from ADC CH0', err);
+                    console.error('Failed to fetch value from ADC CH2', err);
                 } else {
                     if(value > MOISTURE_MAX){
                         value = MOISTURE_MAX;
                     }else if( value < MOISTURE_MIN){
                         value = MOISTURE_MIN;
                     }
-                    data.soilMoisture1 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
+                    data.soilMoisture1 = (1 - ((value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN)))*100;
                 }
             });
 
             adc.readChannel(ADS1x15.channel.CHANNEL_3, (err, value, volts) => {
                 if (err) {
-                    console.error('Failed to fetch value from ADC CH1', err);
+                    console.error('Failed to fetch value from ADC CH3', err);
                 } else {
                     if(value > MOISTURE_MAX){
                         value = MOISTURE_MAX;
-                    }else if( value < s){
+                    }else if( value < MOISTURE_MIN){
                         value = MOISTURE_MIN;
                     }
-                    data.soilMoisture2 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
+                    data.soilMoisture2 = (1 - ((value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN)))*100;
                 }
             });
         }, 1000);
