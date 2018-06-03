@@ -226,14 +226,14 @@ function setup() {
     });
 
     //soil moisture operation
-    gpios.soil_prb1.on('interrupt', (level) => {
+    /* gpios.soil_prb1.on('interrupt', (level) => {
         data.soilMoisture1 = !level; //for digital implementation for now... change if ADC will be used
     });
 
 
     gpios.soil_prb2.on('interrupt', (level) => {
         data.soilMoisture2 = !level; //for digital implementation for now... change if ADC will be used
-    });
+    }); */
 
 
     //relay operations
@@ -247,11 +247,11 @@ function setup() {
 
     // reporting
     setInterval(function () {
-        console.log(`Distance: ${data.tankLevel}`);
+        console.log(`Distance: ${data.tankLevel}%`);
         console.log(`temp: ${data.temperature}°c`);
         console.log(`rhum: ${data.humidity}%`);
-        console.log(`Soil Bed 1: ${data.soilMoisture1}`);
-        console.log(`Soil Bed 2: ${data.soilMoisture2}`);
+        console.log(`Soil Bed 1: ${data.soilMoisture1}%`);
+        console.log(`Soil Bed 2: ${data.soilMoisture2}%`);
         if (connected) {
             //updateDummyData();
             socket.emit('report', data);
