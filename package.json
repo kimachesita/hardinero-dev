@@ -9,6 +9,8 @@
   "author": "kimachesita",
   "license": "ISC",
   "dependencies": {
+    "pigpio": "^1.1.0",
+    "pigpio-dht": "^1.1.0",
     "raspi": "^5.0.2",
     "raspi-i2c": "^6.1.2",
     "raspi-kit-ads1x15": "^1.0.0",
