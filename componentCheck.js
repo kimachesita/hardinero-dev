@@ -86,7 +86,7 @@ function configureRaspi() {
 
         setInterval(function () {
             // Get a single-ended reading from channel-0 and display the results
-            adc.readChannel(ADS1x15.channel.CHANNEL_0, (err, value, volts) => {
+            adc.readChannel(ADS1x15.channel.CHANNEL_2, (err, value, volts) => {
                 if (err) {
                     console.error('Failed to fetch value from ADC CH0', err);
                 } else {
@@ -94,7 +94,7 @@ function configureRaspi() {
                 }
             });
 
-            adc.readChannel(ADS1x15.channel.CHANNEL_1, (err, value, volts) => {
+            adc.readChannel(ADS1x15.channel.CHANNEL_3, (err, value, volts) => {
                 if (err) {
                     console.error('Failed to fetch value from ADC CH1', err);
                 } else {
