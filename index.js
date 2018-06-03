@@ -21,7 +21,11 @@ const SNR_TRIGGER = 27,
     SENSOR_CHECK_RATE = 1000, //ms how often to check parameter conditions
     REPORT_RATE = 5000, //ms
     DEVICE_KEY = process.env.DEVKEY || 'hardinero',
-    TANK_LEVEL_CAL = 150, //tank level calibrator, set to value where 100% is obtained, defaut 100
+    //calibration values
+    DISTANCE_MAX = 200, //sonar value d where tank is empty, change according to calibration
+    DISTANCE_MIN = 0,   //sonar value d where tank is full, change according to calibration
+    MOISTURE_MAX = 4000, //moisture max value, change according to calibration
+    MOISTURE_MIN = 2000, //moisture min value, change according to calibration
     SLENGTH = 120; // number of seconds to activate pump if wateringFrequency condition met
 
 //parameter variables
@@ -133,7 +137,12 @@ function configureRaspi() {
                 if (err) {
                     console.error('Failed to fetch value from ADC CH0', err);
                 } else {
-                    data.soilMoisture1 = value;
+                    if(value > MOISTURE_MAX){
+                        value = MOISTURE_MAX;
+                    }else if( value < MOISTURE_MIN){
+                        value = MOISTURE_MIN;
+                    }
+                    data.soilMoisture1 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
                 }
             });
 
@@ -141,7 +150,12 @@ function configureRaspi() {
                 if (err) {
                     console.error('Failed to fetch value from ADC CH1', err);
                 } else {
-                    data.soilMoisture2 = value;
+                    if(value > MOISTURE_MAX){
+                        value = MOISTURE_MAX;
+                    }else if( value < s){
+                        value = MOISTURE_MIN;
+                    }
+                    data.soilMoisture2 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
                 }
             });
         }, 1000);
@@ -183,7 +197,13 @@ function setup() {
             endTick = tick;
             diff = (endTick >> 0) - (startTick >> 0); // Unsigned 32 bit arithmetic
             distance = diff / 2 / MICROSECDONDS_PER_CM; //get distance based on the speed of sound
-            data.tankLevel = ((TANK_LEVEL_CAL - distance) / TANK_LEVEL_CAL) * 100; //get remaing tank level in %
+            //data.tankLevel = ((TANK_LEVEL_CAL - distance) / TANK_LEVEL_CAL) * 100; //get remaing tank level in %
+            if( distance > DISTANCE_MAX){
+                distance = DISTANCE_MAX;
+            }else if(distance < DISTANCE_MIN){
+                distance = DISTANCE_MIN;
+            }
+            data.tankLevel = 100*(distance - DISTANCE_MAX)/(DISTANCE_MAX - DISTANCE_MIN);
         }
     })
 
