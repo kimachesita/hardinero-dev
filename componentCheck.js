@@ -19,7 +19,7 @@ const SNR_TRIGGER = 27, //pin 13
     RLY_SW2 = 6,        //pin 31
     MICROSECONDS_PER_CM = 1e6 / 34321, //speed of sound
     SENSOR_CHECK_RATE = 1000, //ms how often to check parameter conditions
-    REPORT_RATE = 3000, //ms
+    REPORT_RATE = 2000, //ms
     DEVICE_KEY = process.env.DEVKEY || 'hardinero',
     //calibrated value
     DISTANCE_MAX = 200, //value of d where tank is empty
@@ -94,11 +94,12 @@ function configureRaspi() {
                 if (err) {
                     console.error('Failed to fetch value from ADC CH0', err);
                 } else {
-                    if(value > MOISTURE_MAX){
+                    /* if(value > MOISTURE_MAX){
                         value = MOISTURE_MAX;
                     }else if( value < MOISTURE_MIN){
                         value = MOISTURE_MIN;
-                    }
+                    } */
+                    data.soilMoisture1 = value;
                     data.soilMoisture1 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
                 }
             });
@@ -107,12 +108,13 @@ function configureRaspi() {
                 if (err) {
                     console.error('Failed to fetch value from ADC CH1', err);
                 } else {
-                    if(value > MOISTURE_MAX){
+                    /* if(value > MOISTURE_MAX){
                         value = MOISTURE_MAX;
                     }else if( value < s){
                         value = MOISTURE_MIN;
-                    }
-                    data.soilMoisture2 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
+                    } */
+                    //data.soilMoisture2 = 100*(value - MOISTURE_MIN)/(MOISTURE_MAX-MOISTURE_MIN);
+                    data.soilMoisture2 = value;
                 }
             });
         }, 1000);
@@ -137,13 +139,13 @@ function setup() {
             endTick = tick;
             diff = (endTick >> 0) - (startTick >> 0); // Unsigned 32 bit arithmetic
             distance = diff / 2 / MICROSECONDS_PER_CM; //get distance based on the speed of sound
-            if( distance > DISTANCE_MAX){
+           /*  if( distance > DISTANCE_MAX){
                 distance = DISTANCE_MAX;
             }else if(distance < DISTANCE_MIN){
                 distance = DISTANCE_MIN;
-            }
-            data.tankLevel = 100*(distance - DISTANCE_MAX)/(DISTANCE_MAX - DISTANCE_MIN);
-            //data.tankLevel = distance;
+            } */
+            //data.tankLevel = 100*(distance - DISTANCE_MAX)/(DISTANCE_MAX - DISTANCE_MIN);
+            data.tankLevel = distance;
         }
     })
 
