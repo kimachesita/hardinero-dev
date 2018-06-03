@@ -149,7 +149,7 @@ function setup() {
             }else if(distance < DISTANCE_MIN){
                 distance = DISTANCE_MIN;
             }
-            data.tankLevelCorrected = 100*(distance - DISTANCE_MAX)/(DISTANCE_MAX - DISTANCE_MIN);
+            data.tankLevelCorrected = 100*(DISTANCE_MAX - distance)/(DISTANCE_MAX - DISTANCE_MIN);
             
         }
     })
