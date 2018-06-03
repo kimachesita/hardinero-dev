@@ -103,6 +103,5 @@ function initiateAutoWaterRoutine() {
     }, SENSOR_CHECK_RATE);
 }
 
-
 initiateAutoWaterRoutine();
 simulateData();

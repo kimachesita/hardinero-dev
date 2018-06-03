@@ -287,18 +287,5 @@ function setup() {
 }
 
 
-// for testing purposes
-/* function updateDummyData(){
-    data.weather = 'No Data';
-    data.temperature++;
-    data.humidity++;
-    data.soilMoisture1++;
-    data.soilMoisture2++;
-    data.waterPumpOn = !data.waterPumpOn;
-    data.tankLevel++;
-    data.lastWatering = 'No Data'
-} */
-
-
 //begin main routine
 setup();
